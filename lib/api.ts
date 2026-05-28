@@ -72,3 +72,19 @@ export async function createEscrow(data: EscrowInput): Promise<EscrowResponse> {
   }
   return res.json();
 }
+
+export async function getVendorEscrows(token?: string): Promise<Escrow[]> {
+  const headers: HeadersInit = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${API_URL}/vendor/escrows`, {
+    cache: 'no-store',
+    headers,
+  });
+  if (!res.ok) {
+    throw new Error('Failed to fetch vendor escrows');
+  }
+  return res.json();
+}
