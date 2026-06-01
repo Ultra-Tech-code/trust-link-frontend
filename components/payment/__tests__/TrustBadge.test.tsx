@@ -34,7 +34,7 @@ describe("TrustBadge", () => {
     render(<TrustBadge contractAddress={contractAddress} />);
     
     // Default truncation is 4 start, 4 end
-    const expectedTruncation = "CA4H...R6J";
+    const expectedTruncation = "CA4H...3R6J";
     expect(screen.getByText(expectedTruncation)).toBeInTheDocument();
   });
 

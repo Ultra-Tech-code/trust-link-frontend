@@ -56,6 +56,21 @@ const STAGE_ORDER: ShipmentStage[] = [
   "DELIVERED",
 ];
 
+const CHECKMARK_ICON = (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth={3} 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    aria-hidden="true"
+    data-testid="checkmark-icon"
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
 const STAGE_ICONS: Record<ShipmentStage, React.ReactNode> = {
   ORDER_PLACED: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -143,7 +158,9 @@ function StageIcon({ stageId, status }: { stageId: ShipmentStage; status: StageS
 
   return (
     <span style={resolvedStyle}>
-      <span style={iconStyle}>{STAGE_ICONS[stageId]}</span>
+      <span style={iconStyle}>
+        {status === "completed" ? CHECKMARK_ICON : STAGE_ICONS[stageId]}
+      </span>
     </span>
   );
 }

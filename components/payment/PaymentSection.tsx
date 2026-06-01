@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useTranslation } from "react-i18next";
 
 async function fetchPaymentData() {
   await new Promise((resolve) => setTimeout(resolve, 150));
-  return { status: "Payments are up to date and ready to process." };
+  return { status: "ready" };
 }
 
 export default function PaymentSection({ loading = false }: { loading?: boolean }) {
+  const { t } = useTranslation();
   const [data, setData] = useState<{ status: string } | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
@@ -33,7 +35,7 @@ export default function PaymentSection({ loading = false }: { loading?: boolean 
 
   return (
     <div className="rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="text-lg font-medium text-zinc-950 dark:text-zinc-100">{data.status}</p>
+      <p className="text-lg font-medium text-zinc-950 dark:text-zinc-100">{t("payment.status")}</p>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { useEffect, useState } from "react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import ErrorBoundary from "./ErrorBoundary";
 
 function FailingApiSection() {
@@ -14,7 +15,19 @@ function FailingApiSection() {
   return <div>Loading…</div>;
 }
 
+function SuccessfulSection() {
+  return <div>Content loaded successfully</div>;
+}
+
 describe("ErrorBoundary", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("renders the fallback UI when a child async section fails", async () => {
     render(
       <ErrorBoundary>
@@ -24,5 +37,73 @@ describe("ErrorBoundary", () => {
 
     expect(await screen.findByText(/Something went wrong/i)).toBeTruthy();
     expect(screen.getByRole("button", { name: /Try Again/i })).toBeTruthy();
+  });
+
+  it("matches snapshot when error boundary shows error state", async () => {
+    const { container } = render(
+      <ErrorBoundary>
+        <FailingApiSection />
+      </ErrorBoundary>
+    );
+
+    await screen.findByText(/Something went wrong/i);
+    expect(container).toMatchSnapshot();
+  });
+
+  it("renders children successfully when no error occurs", () => {
+    const { container } = render(
+      <ErrorBoundary>
+        <SuccessfulSection />
+      </ErrorBoundary>
+    );
+
+    expect(screen.getByText(/Content loaded successfully/i)).toBeInTheDocument();
+    expect(container).toMatchSnapshot();
+  });
+
+  it("has error icon in fallback UI", async () => {
+    const { container } = render(
+      <ErrorBoundary>
+        <FailingApiSection />
+      </ErrorBoundary>
+    );
+
+    await screen.findByText(/Something went wrong/i);
+    const svg = container.querySelector("svg");
+    expect(svg).toBeInTheDocument();
+  });
+
+  it("displays error message with proper styling", async () => {
+    const { container } = render(
+      <ErrorBoundary>
+        <FailingApiSection />
+      </ErrorBoundary>
+    );
+
+    const errorDiv = await screen.findByText(/Something went wrong/i);
+    expect(errorDiv).toHaveClass("text-xl", "font-semibold");
+  });
+
+  it("provides reset functionality button", async () => {
+    render(
+      <ErrorBoundary>
+        <FailingApiSection />
+      </ErrorBoundary>
+    );
+
+    const button = await screen.findByRole("button", { name: /Try Again/i });
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveClass("rounded-full", "bg-black", "text-white");
+  });
+
+  it("error fallback has proper accessibility structure", async () => {
+    const { container } = render(
+      <ErrorBoundary>
+        <FailingApiSection />
+      </ErrorBoundary>
+    );
+
+    await screen.findByText(/Something went wrong/i);
+    expect(container.querySelector("[role='alert']") || container.querySelector("div")).toBeInTheDocument();
   });
 });

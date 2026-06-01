@@ -162,6 +162,18 @@ export default function EscrowCreateForm() {
     }
   };
 
+  const downloadQR = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const escrowId = getEscrowIdFromUrl(resultUrl || "escrow");
+    const pngUrl = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = pngUrl;
+    a.download = `escrow_${escrowId}.png`;
+    a.click();
+    toast.success("QR code downloaded");
+  };
+
   return (
     <div className="mx-auto w-full max-w-2xl rounded-[32px] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:p-8">
       <form onSubmit={onSubmit} className="space-y-5">

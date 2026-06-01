@@ -2,13 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Skeleton } from "@/components/ui/Skeleton";
-import QRCode from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Copy, Share2, Download } from "lucide-react";
 import { toast } from "sonner";
 
-// Mock fetch – replace with real API when available
 async function fetchEscrowLink() {
   await new Promise((resolve) => setTimeout(resolve, 150));
   return {
@@ -16,29 +15,26 @@ async function fetchEscrowLink() {
     status: "Active",
     amount: "$12,450",
     expires: "May 31, 2026",
-    url: "https://trustlink.example.com/escrow/1293",
+    escrowId: "1293",
+    url: "https://trustlink.example.com/pay/1293",
   };
 }
 
 export default function EscrowLinkCard({ loading = false }: { loading?: boolean }) {
-  const [link, setLink] = useState<
-    | {
-        title: string;
-        status: string;
-        amount: string;
-        expires: string;
-        url: string;
-      }
-    | null
-  >(null);
+  const [link, setLink] = useState<{
+    title: string;
+    status: string;
+    amount: string;
+    expires: string;
+    escrowId: string;
+    url: string;
+  } | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    fetchEscrowLink()
-      .then(setLink)
-      .catch(setError);
+    fetchEscrowLink().then(setLink).catch(setError);
   }, []);
 
   if (error) throw error;
@@ -78,7 +74,7 @@ export default function EscrowLinkCard({ loading = false }: { loading?: boolean 
     const pngUrl = canvas.toDataURL("image/png");
     const a = document.createElement("a");
     a.href = pngUrl;
-    a.download = "escrow_qr.png";
+    a.download = `escrow_${link.escrowId}.png`;
     a.click();
     toast.success("QR code downloaded");
   };
@@ -121,13 +117,13 @@ export default function EscrowLinkCard({ loading = false }: { loading?: boolean 
         </div>
       </div>
 
-      {/* QR Code */}
+      {/* QR Code — sized correctly for mobile scanning */}
       <div className="mt-4 flex justify-center">
-        <QRCode
+        <QRCodeCanvas
+          ref={canvasRef}
           value={link.url}
-          size={180}
-          renderAs="canvas"
-          ref={canvasRef as any}
+          size={200}
+          marginSize={2}
         />
       </div>
     </div>
