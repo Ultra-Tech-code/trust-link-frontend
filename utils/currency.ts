@@ -7,3 +7,4 @@ export function formatUSDC(value: number | string | null | undefined): string {
     maximumFractionDigits: 2,
   }).format(num) + " USDC";
 }
+// Example usage:
