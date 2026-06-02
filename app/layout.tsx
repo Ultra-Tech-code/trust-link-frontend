@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/components/providers/WalletProvider";
+import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import I18nProvider from "@/components/providers/I18nProvider";
 import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
@@ -43,15 +44,17 @@ export default function RootLayout({
           Skip to content
         </a>
         <WalletProvider>
-          <I18nProvider>
-            {/* pb-20 on mobile gives room for the fixed BottomNav; md:pb-0 removes it on desktop */}
-            <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col pb-20 md:pb-0 outline-none">
-              {children}
-            </main>
-            <Footer />
-            <BottomNav />
-            <Toaster richColors position="top-right" />
-          </I18nProvider>
+          <NotificationProvider>
+            <I18nProvider>
+              {/* pb-20 on mobile gives room for the fixed BottomNav; md:pb-0 removes it on desktop */}
+              <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col pb-20 md:pb-0 outline-none">
+                {children}
+              </main>
+              <Footer />
+              <BottomNav />
+              <Toaster richColors position="top-right" />
+            </I18nProvider>
+          </NotificationProvider>
         </WalletProvider>
         <Toaster position="bottom-right" />
       </body>
