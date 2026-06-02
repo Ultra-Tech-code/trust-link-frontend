@@ -6,6 +6,7 @@ import { Sparkles, X } from "lucide-react";
 import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import DashboardSection from "@/components/dashboard/DashboardSection";
 import { Skeleton } from "@/components/ui/Skeleton";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 function UpgradeBanner({ onDismiss }: { onDismiss: () => void }) {
   return (
@@ -84,6 +85,10 @@ export default function DashboardPage() {
         {showUpgradeBanner && (
           <UpgradeBanner onDismiss={() => setShowUpgradeBanner(false)} />
         )}
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-3xl font-semibold text-zinc-950 dark:text-white">Dashboard</h1>
+          <NotificationBell />
+        </div>
         <ErrorBoundary>
           <DashboardSection />
         </ErrorBoundary>

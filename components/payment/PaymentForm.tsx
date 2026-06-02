@@ -4,6 +4,7 @@ import { useState } from "react";
 import useWallet from "@/hooks/useWallet";
 import { submitPayment } from "@/lib/stellar/contract";
 import { Loader2, ShieldCheck, CheckCircle2, AlertCircle } from "lucide-react";
+import { formatUSDC } from "@/utils/currency";
 
 interface PaymentFormProps {
   amount?: string;
@@ -57,7 +58,7 @@ export default function PaymentForm({
         <div className="p-4 bg-muted-bg rounded-2xl space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted">Amount</span>
-            <span className="font-bold text-foreground">{amount} XLM</span>
+            <span className="font-bold text-foreground">{formatUSDC(amount)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted">Recipient</span>
@@ -66,14 +67,14 @@ export default function PaymentForm({
         </div>
 
         {error && (
-          <div className="p-4 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-2xl flex items-start space-x-3 animate-in fade-in slide-in-from-top-2">
+          <div className="p-4 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-2xl flex items-start space-x-3 ">
             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <p>{error}</p>
           </div>
         )}
 
         {hash && (
-          <div className="p-4 bg-success/10 border border-success/20 text-success text-sm rounded-2xl flex items-start space-x-3 animate-in fade-in zoom-in-95">
+          <div className="p-4 bg-success/10 border border-success/20 text-success text-sm rounded-2xl flex items-start space-x-3 ">
             <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <div className="space-y-1">
               <p className="font-bold">Payment Confirmed</p>
@@ -110,6 +111,7 @@ import { signTransaction } from "@/lib/stellar/freighter";
 import { getStellarExpertUrl } from "@/lib/explorer";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useNetwork } from "@/components/providers/NetworkProvider";
 
 export interface PaymentFormProps {
   escrowId: string;
@@ -157,6 +159,7 @@ export default function PaymentForm({
   onPaymentSuccess,
 }: PaymentFormProps) {
   const { status: walletStatus } = useWallet();
+  const { network } = useNetwork();
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -229,19 +232,19 @@ export default function PaymentForm({
         <div className="flex justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
           <span className="text-zinc-500 dark:text-zinc-400">Item Amount</span>
           <span className="font-medium text-zinc-900 dark:text-zinc-100">
-            XLM {amount}
+            {formatUSDC(amount)}
           </span>
         </div>
         <div className="flex justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
           <span className="text-zinc-500 dark:text-zinc-400">Protocol Fee</span>
           <span className="font-medium text-zinc-900 dark:text-zinc-100">
-            XLM {protocolFee}
+            {formatUSDC(protocolFee)}
           </span>
         </div>
         <div className="flex justify-between pt-2">
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">Total</span>
           <span className="font-bold text-zinc-900 dark:text-zinc-100">
-            XLM {total}
+            {formatUSDC(total)}
           </span>
         </div>
       </div>
@@ -255,7 +258,7 @@ export default function PaymentForm({
             Transaction: {truncateHash(txHash)}
           </p>
           <a
-            href={getStellarExpertUrl(txHash)}
+            href={getStellarExpertUrl(txHash, network)}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-3 inline-block text-sm font-medium text-green-700 underline hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
