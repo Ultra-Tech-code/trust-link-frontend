@@ -2,114 +2,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import PaymentForm from "../PaymentForm";
 import useWallet from "@/hooks/useWallet";
-import { submitPayment } from "@/lib/stellar/contract";
-
-// Mock the hooks and lib functions
-vi.mock("@/hooks/useWallet");
-vi.mock("@/lib/stellar/contract");
-
-describe("PaymentForm Component", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("renders disabled button when wallet is not connected", () => {
-    (useWallet as any).mockReturnValue({
-      status: "disconnected",
-      publicKey: null,
-      connect: vi.fn(),
-      disconnect: vi.fn(),
-    });
-
-    render(<PaymentForm />);
-    
-    const button = screen.getByRole("button");
-    expect(button).toBeDisabled();
-    expect(screen.getByText(/Connect Wallet to Pay/i)).toBeInTheDocument();
-    expect(screen.getByText(/Wallet connection required/i)).toBeInTheDocument();
-  });
-
-  it("renders enabled button when wallet is connected", () => {
-    (useWallet as any).mockReturnValue({
-      status: "connected",
-      publicKey: "GABC...",
-      connect: vi.fn(),
-      disconnect: vi.fn(),
-    });
-
-    render(<PaymentForm />);
-    
-    const button = screen.getByRole("button");
-    expect(button).toBeEnabled();
-    expect(screen.getByText(/Complete Payment/i)).toBeInTheDocument();
-  });
-
-  it("shows loading spinner and disables button during submission", async () => {
-    (useWallet as any).mockReturnValue({
-      status: "connected",
-      publicKey: "GABC...",
-    });
-
-    // Make submitPayment stay in pending state
-    (submitPayment as any).mockReturnValue(new Promise(() => {}));
-
-    render(<PaymentForm />);
-    
-    const button = screen.getByRole("button");
-    fireEvent.click(button);
-
-    // Check for loading state (form handle logic sets loading=true)
-    // We expect the button to be disabled and have a spinner (Loader2 has data-testid if we added it, but we can check for svg or just text if it changed)
-    // In our implementation, text doesn't show when loading, only spinner.
-    expect(button).toBeDisabled();
-    // Lucide components don't have easy text content, but we can check for the svg or aria-busy if we added it.
-    // Let's assume the button has no text when loading as per our code: {loading ? <Loader2... /> : <span>...</span>}
-    expect(screen.queryByText(/Complete Payment/i)).not.toBeInTheDocument();
-  });
-
-  it("renders transaction hash on success", async () => {
-    (useWallet as any).mockReturnValue({
-      status: "connected",
-      publicKey: "GABC...",
-    });
-
-    const mockHash = "test_hash_12345";
-    (submitPayment as any).mockResolvedValue(mockHash);
-
-    render(<PaymentForm />);
-    
-    const button = screen.getByRole("button");
-    fireEvent.click(button);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Payment Confirmed/i)).toBeInTheDocument();
-      expect(screen.getByText(mockHash)).toBeInTheDocument();
-    });
-    
-    // Button should be disabled after success
-    expect(button).toBeDisabled();
-  });
-
-  it("renders human-readable error message on failure", async () => {
-    (useWallet as any).mockReturnValue({
-      status: "connected",
-      publicKey: "GABC...",
-    });
-
-    const errorMessage = "Insufficient XLM balance";
-    (submitPayment as any).mockRejectedValue(new Error(errorMessage));
-
-    render(<PaymentForm />);
-    
-    const button = screen.getByRole("button");
-    fireEvent.click(button);
-
-    await waitFor(() => {
-      expect(screen.getByText(errorMessage)).toBeInTheDocument();
-    });
-    
-    // Button should be re-enabled to allow retry
-    expect(button).toBeEnabled();
 import { signTransaction } from "@/lib/stellar/freighter";
 import { toast } from "sonner";
 
@@ -147,7 +39,7 @@ const defaultProps = {
 describe("PaymentForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWallet as any).mockReturnValue({ status: "connected" });
+    (useWallet as any).mockReturnValue({ isConnected: true });
   });
 
   it("renders payment summary and shows amount/fee/total correctly", () => {
@@ -160,7 +52,7 @@ describe("PaymentForm", () => {
   });
 
   it("is disabled when wallet is disconnected", () => {
-    (useWallet as any).mockReturnValue({ status: "disconnected" });
+    (useWallet as any).mockReturnValue({ isConnected: false });
     render(<PaymentForm {...defaultProps} />);
 
     const button = screen.getByRole("button", { name: /Pay with Freighter/i });
@@ -169,8 +61,7 @@ describe("PaymentForm", () => {
   });
 
   it("shows loading state and prevents duplicate submissions", async () => {
-    vi.useFakeTimers();
-    (signTransaction as any).mockResolvedValue("signed_xdr");
+    (signTransaction as any).mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve("signed_xdr"), 100)));
 
     render(<PaymentForm {...defaultProps} />);
     const button = screen.getByRole("button", { name: /Pay with Freighter/i });
@@ -180,16 +71,9 @@ describe("PaymentForm", () => {
     // After click, it should change to loading state
     expect(await screen.findByText("Processing payment...")).toBeInTheDocument();
     expect(button).toBeDisabled(); // Prevents duplicate submissions
-
-    // Fast forward through network delays
-    await vi.runAllTimersAsync();
-    
-    vi.useRealTimers();
   });
 
   it("renders success state with tx hash and explorer link", async () => {
-    vi.useFakeTimers();
-    const mockTxHash = "3f7a1234567891bc";
     const onPaymentSuccess = vi.fn();
     (signTransaction as any).mockResolvedValue("signed_xdr");
     
@@ -201,11 +85,16 @@ describe("PaymentForm", () => {
     const button = screen.getByRole("button", { name: /Pay with Freighter/i });
 
     fireEvent.click(button);
-    await vi.runAllTimersAsync();
 
-    expect(screen.getByText("Payment successful")).toBeInTheDocument();
-    // 3f7a1f9a22...91bc
-    expect(screen.getByText(/Transaction: 3f7a1f/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Payment successful")).toBeInTheDocument();
+    }, { timeout: 5000 });
+
+    // The hash generation in PaymentForm.tsx: "3f7a" + Math.random().toString(16).substring(2, 10) + "91bc"
+    // With 0.12345678, Math.random().toString(16) is "0.1f9a222a"
+    // .substring(2, 10) is "1f9a222a"
+    // Result: "3f7a1f9a222a91bc"
+    expect(screen.getByText(/Transaction: 3f7a1f9a222a91bc/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /View on Stellar Expert/i })).toHaveAttribute(
       "href",
       expect.stringContaining("testnet.stellarexpert.io")
@@ -214,23 +103,21 @@ describe("PaymentForm", () => {
     expect(toast.success).toHaveBeenCalledWith("Payment successful");
 
     Math.random = originalRandom;
-    vi.useRealTimers();
   });
 
   it("shows error state on failure (wallet rejection)", async () => {
-    vi.useFakeTimers();
     (signTransaction as any).mockRejectedValue(new Error("User rejected the transaction"));
 
     render(<PaymentForm {...defaultProps} />);
     const button = screen.getByRole("button", { name: /Pay with Freighter/i });
 
     fireEvent.click(button);
-    await vi.runAllTimersAsync();
 
-    expect(await screen.findByText("Transaction was rejected in wallet")).toBeInTheDocument();
-    expect(toast.error).toHaveBeenCalledWith("Transaction was rejected in wallet");
+    await waitFor(() => {
+      expect(screen.getByText("Transaction was rejected in wallet")).toBeInTheDocument();
+    }, { timeout: 5000 });
     
-    vi.useRealTimers();
+    expect(toast.error).toHaveBeenCalledWith("Transaction was rejected in wallet");
   });
 
   it("shows error if escrow is not payable", async () => {

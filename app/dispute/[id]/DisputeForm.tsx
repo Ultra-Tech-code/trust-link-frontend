@@ -17,9 +17,7 @@ const REASON_CATEGORIES = [
 ] as const;
 
 const disputeSchema = z.object({
-  reason: z.enum(REASON_CATEGORIES, {
-    required_error: "Please select a reason category",
-  }),
+  reason: z.enum(REASON_CATEGORIES),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000),
   evidence: z.array(z.string()).min(1, "At least one piece of evidence is required"),
 });

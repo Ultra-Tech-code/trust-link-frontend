@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Skeleton } from "@/components/ui/Skeleton";
-import ShipTrackingModal from "@/components/dashboard/ShipTrackingModal";
-import { getVendorEscrows } from "@/lib/api";
-import type { Escrow } from "@/types";
-import EmptyVendorState from "./EmptyVendorState";
+import { cn, formatTimeAgo } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 export default function VendorDashboardList({ loading = false }: { loading?: boolean }) {
+  const { i18n } = useTranslation();
   const [escrows, setEscrows] = useState<Escrow[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [selectedEscrow, setSelectedEscrow] = useState<Escrow | null>(null);
@@ -69,7 +67,7 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
                   <span>•</span>
                   <span>Amount: {escrow.amount} USDC</span>
                   <span>•</span>
-                  <span>Created: {new Date(escrow.createdAt).toLocaleDateString()}</span>
+                  <span>Created: {formatTimeAgo(escrow.createdAt, i18n.language)}</span>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3">

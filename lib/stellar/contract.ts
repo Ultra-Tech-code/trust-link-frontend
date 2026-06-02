@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  Contract,
+  Keypair,
+  TransactionBuilder,
+  Networks,
+  Operation,
+  xdr,
+  BASE_FEE,
+  StrKey,
+} from "@stellar/stellar-sdk";
 import { signTransaction } from "./freighter";
 
 export async function submitPayment(amount: string, destination: string) {
@@ -16,16 +26,7 @@ export async function submitPayment(amount: string, destination: string) {
   }
 
   return "b2d8e9f...a1c3b5d7";
-import {
-  Contract,
-  Keypair,
-  TransactionBuilder,
-  Networks,
-  Operation,
-  xdr,
-  BASE_FEE,
-  StrKey,
-} from "@stellar/js-sdk";
+}
 
 export interface ContractCallOptions {
   contractId: string;
@@ -239,13 +240,17 @@ export function isContractSuccess(response: any): boolean {
     return false;
   }
 
+  if (response.success === false) {
+    return false;
+  }
+
   if (response.success === true) {
     return true;
   }
 
-  if (response.error === null || response.error === undefined) {
-    return true;
+  if (response.error !== null && response.error !== undefined) {
+    return false;
   }
 
-  return false;
+  return true;
 }

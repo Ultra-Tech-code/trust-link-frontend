@@ -6,24 +6,29 @@ import TrackingTimeline, {
   type TrackingStage,
 } from "@/components/escrow/TrackingTimeline";
 
+const now = new Date();
+const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString();
+const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString();
+const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+
 const DEMO_STAGES: TrackingStage[] = [
   {
     id: "ORDER_PLACED",
     label: "Order Placed",
     description: "Escrow funded & order confirmed",
-    timestamp: "2025-05-24T09:15:00Z",
+    timestamp: oneDayAgo,
   },
   {
     id: "PICKED_UP",
     label: "Picked Up",
     description: "Vendor handed over to courier",
-    timestamp: "2025-05-24T14:30:00Z",
+    timestamp: eightHoursAgo,
   },
   {
     id: "IN_TRANSIT",
     label: "In Transit",
     description: "Shipment en route to destination",
-    timestamp: "2025-05-25T08:00:00Z",
+    timestamp: fourHoursAgo,
   },
   {
     id: "OUT_FOR_DELIVERY",

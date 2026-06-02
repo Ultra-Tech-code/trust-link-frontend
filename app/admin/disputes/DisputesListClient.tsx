@@ -5,6 +5,8 @@ import { Dispute } from "@/types";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatTimeAgo } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 type SortField = "date" | "amount" | "status";
 
@@ -22,6 +24,7 @@ function sortDisputes(disputes: Dispute[], field: SortField): Dispute[] {
 
 export function DisputesListClient() {
   const router = useRouter();
+  const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField>("date");
@@ -103,7 +106,7 @@ export function DisputesListClient() {
                   </p>
                   <p className="text-zinc-600 dark:text-zinc-400">{dispute.status}</p>
                   <p className="text-xs text-zinc-500">
-                    {new Date(dispute.createdAt).toLocaleString()}
+                    {formatTimeAgo(dispute.createdAt, i18n.language)}
                   </p>
                 </div>
               </div>

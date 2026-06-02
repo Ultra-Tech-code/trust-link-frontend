@@ -1,12 +1,11 @@
 // src/escrow/__test__/DisputeForm.test.tsx
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import DisputeForm from '../DisputeForm';
 
 // Mock fetch for API calls
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock file for upload testing
 const mockFile = new File(['test content'], 'evidence.pdf', { type: 'application/pdf' });

@@ -3,29 +3,39 @@
 import { use } from "react";
 import { ArrowLeft, Star, ShieldCheck, MapPin, History, Package } from "lucide-react";
 import Link from "next/link";
+import { formatTimeAgo } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 // Mock data generator for the vendor profile
-const getVendorMock = (address: string) => ({
-  name: "Premium Electronics Co.",
-  address,
-  rating: 4.8,
-  reviewsCount: 124,
-  verificationLevel: "Gold",
-  location: "New York, USA",
-  joinDate: "Jan 2024",
-  stats: {
-    totalTransactions: 342,
-    successfulEscrows: 340,
-    disputeRate: "0.5%",
-  },
-  recentTransactions: [
-    { id: "tx-101", item: "MacBook Pro M3", amount: 2400, status: "completed", date: "2024-05-12" },
-    { id: "tx-102", item: "AirPods Pro", amount: 250, status: "in-transit", date: "2024-05-15" },
-    { id: "tx-103", item: "Magic Keyboard", amount: 150, status: "completed", date: "2024-05-10" },
-  ]
-});
+const getVendorMock = (address: string) => {
+  const now = new Date();
+  const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
+
+  return {
+    name: "Premium Electronics Co.",
+    address,
+    rating: 4.8,
+    reviewsCount: 124,
+    verificationLevel: "Gold",
+    location: "New York, USA",
+    joinDate: "2024-01-01T12:00:00Z",
+    stats: {
+      totalTransactions: 342,
+      successfulEscrows: 340,
+      disputeRate: "0.5%",
+    },
+    recentTransactions: [
+      { id: "tx-101", item: "MacBook Pro M3", amount: 2400, status: "completed", date: twoWeeksAgo },
+      { id: "tx-102", item: "AirPods Pro", amount: 250, status: "in-transit", date: threeDaysAgo },
+      { id: "tx-103", item: "Magic Keyboard", amount: 150, status: "completed", date: oneWeekAgo },
+    ]
+  };
+};
 
 export default function VendorProfilePage({ params }: { params: Promise<{ address: string }> }) {
+  const { i18n } = useTranslation();
   const unwrappedParams = use(params);
   const vendor = getVendorMock(unwrappedParams.address);
 
@@ -64,7 +74,7 @@ export default function VendorProfilePage({ params }: { params: Promise<{ addres
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" />
-                    <span>{vendor.location}</span>
+                    <span>Joined {formatTimeAgo(vendor.joinDate, i18n.language)}</span>
                   </div>
                 </div>
               </div>
@@ -110,7 +120,7 @@ export default function VendorProfilePage({ params }: { params: Promise<{ addres
                   </div>
                   <div>
                     <p className="font-medium text-zinc-900 dark:text-white">{tx.item}</p>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{tx.date}</p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{formatTimeAgo(tx.date, i18n.language)}</p>
                   </div>
                 </div>
                 <div className="text-right">
