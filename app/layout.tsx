@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NetworkProvider } from "@/components/providers/NetworkProvider";
 import { WalletProvider } from "@/components/providers/WalletProvider";
+import { SubscriptionProvider } from "@/components/providers/SubscriptionProvider";
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import I18nProvider from "@/components/providers/I18nProvider";
 import BottomNav from "@/components/layout/BottomNav";
@@ -51,6 +52,8 @@ export default function RootLayout({
           Skip to content
         </a>
         <WalletProvider>
+          <SubscriptionProvider>
+            <I18nProvider>
           <NotificationProvider>
             <I18nProvider>
               <Navbar />
@@ -60,6 +63,9 @@ export default function RootLayout({
               </main>
               <Footer />
               <BottomNav />
+              <Toaster richColors position="top-right" />
+            </I18nProvider>
+          </SubscriptionProvider>
               <Toaster position="top-right" theme="system" />
             </I18nProvider>
           </NotificationProvider>
