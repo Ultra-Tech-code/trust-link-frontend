@@ -173,6 +173,8 @@ export async function upgradeSubscription(token?: string): Promise<Subscription>
     throw new Error(`Upgrade failed: ${err}`);
   }
   return res.json();
+}
+
 export interface BuyerContactInput {
   email?: string;
   phone?: string;

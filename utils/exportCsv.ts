@@ -1,3 +1,5 @@
+import { sanitizeCsvCell } from "@/lib/sanitize";
+
 /**
  * Convert an array of objects to a CSV string and trigger a browser download.
  *
@@ -14,7 +16,8 @@ export function downloadCsv<T extends Record<string, unknown>>(
   if (rows.length === 0) return;
 
   const escape = (value: unknown): string => {
-    const str = String(value ?? "");
+    // Neutralise spreadsheet formula injection before quoting.
+    const str = sanitizeCsvCell(value);
     // Wrap in quotes if the value contains a comma, quote, or newline
     if (str.includes(",") || str.includes('"') || str.includes("\n")) {
       return `"${str.replace(/"/g, '""')}"`;
