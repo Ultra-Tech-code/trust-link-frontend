@@ -16,6 +16,7 @@ import { useNetwork } from "@/components/providers/NetworkProvider";
 interface WalletContextType {
   publicKey: string | null;
   token: string | null;
+  jwt: string | null;
   isConnected: boolean;
   isInstalled: boolean;
   connect: () => Promise<void>;
@@ -33,6 +34,7 @@ const TOKEN_STORAGE_KEY = "wallet.token";
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const jwt = token;
   const [isInstalled, setIsInstalled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,9 +49,6 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const signedXdr = await freighterSignTransaction(challengeXdr, net);
       const jwt = await verifyChallenge(signedXdr);
       setToken(jwt);
-      if (typeof window !== "undefined") {
-        localStorage.setItem(TOKEN_STORAGE_KEY, jwt);
-      }
       return jwt;
     } catch (err: any) {
       console.error("Authentication failed:", err);
@@ -65,19 +64,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       setIsInstalled(installed);
       
       const storedPublicKey = typeof window !== "undefined" ? localStorage.getItem(PUBLIC_KEY_STORAGE_KEY) : null;
-      const storedToken = typeof window !== "undefined" ? localStorage.getItem(TOKEN_STORAGE_KEY) : null;
-      
       if (storedPublicKey && installed) {
         try {
           const connected = await freighterIsConnected();
           if (connected) {
             setPublicKey(storedPublicKey);
             Sentry.setUser({ id: storedPublicKey });
-            if (storedToken) {
-              setToken(storedToken);
-            } else {
-              await authenticate(storedPublicKey);
-            }
+            await authenticate(storedPublicKey);
           } else {
             if (typeof window !== "undefined") {
               localStorage.removeItem(PUBLIC_KEY_STORAGE_KEY);
@@ -177,6 +170,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       value={{
         publicKey,
         token,
+        jwt,
         isConnected: !!publicKey,
         isInstalled,
         connect,

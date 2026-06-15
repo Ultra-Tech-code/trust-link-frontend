@@ -16,6 +16,7 @@ import { useWallet as useWalletFromProvider } from "@/components/providers/Walle
  * @returns An object containing:
  *   - `publicKey`       – The connected Stellar public key, or `null`.
  *   - `token`           – JWT auth token obtained via challenge/response, or `null`.
+ *   - `jwt`             – Alias for the current JWT, always available in memory.
  *   - `isConnected`     – `true` when a public key is present.
  *   - `isInstalled`     – `true` when the Freighter browser extension is detected.
  *   - `connect`         – Initiates the Freighter connection and authentication flow.
@@ -43,4 +44,11 @@ import { useWallet as useWalletFromProvider } from "@/components/providers/Walle
  *
  * @see {@link WalletProvider} for the context provider that must wrap your component tree.
  */
-export default useWalletFromProvider;
+export default function useWallet() {
+  const wallet = useWalletFromProvider();
+
+  return {
+    ...wallet,
+    jwt: wallet.jwt ?? wallet.token ?? null,
+  };
+}
