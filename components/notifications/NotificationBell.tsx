@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useState, type JSX } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import type { JSX } from "react";
 import Link from "next/link";
 import { Bell, CheckCheck, Package, Banknote, Truck, ShieldAlert, RotateCcw, CircleCheck, Clock, AlertCircle } from "lucide-react";
 import { useNotifications } from "@/components/providers/NotificationProvider";

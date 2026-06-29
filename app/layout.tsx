@@ -14,7 +14,6 @@ import OfflineBanner from "@/components/layout/OfflineBanner";
 import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
-import CommandPalette from "@/components/ui/CommandPalette";
 import { Suspense } from "react";
 import TopProgressBar from "@/components/ui/TopProgressBar";
 
@@ -88,7 +87,6 @@ export default function RootLayout({
             </SubscriptionProvider>
           </WalletProvider>
         </NetworkProvider>
-        <CommandPalette />
         </ThemeProvider>
       </body>
     </html>
