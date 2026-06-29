@@ -56,7 +56,7 @@ export default function EscrowLinkCard({
   const [isCopying, setIsCopying] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [showQRCode, setShowQRCode] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(true);
 
   const copyToClipboard = async (text: string) => {
     if (!navigator.clipboard || !navigator.clipboard.writeText) {
