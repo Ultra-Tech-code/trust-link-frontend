@@ -4,7 +4,15 @@ export function setEscrowContext(escrowId: string) {
   Sentry.setTag("escrow.id", escrowId);
 }
 
-export function captureWalletError(error: Error, context: any) {
+export interface WalletErrorContext {
+  xdr?: string;
+  contractId?: string;
+  network?: string;
+  action?: string;
+  [key: string]: unknown;
+}
+
+export function captureWalletError(error: Error, context: WalletErrorContext) {
   Sentry.captureException(error, {
     contexts: {
       transaction: context,
