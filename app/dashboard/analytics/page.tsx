@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import VendorAnalyticsSection from "@/components/dashboard/VendorAnalyticsSection";
+import dynamic from 'next/dynamic';
+const VendorAnalyticsSection = dynamic(() => import('@/components/dashboard/VendorAnalyticsSection'), { ssr: false });
 
 export const metadata = {
   title: "Vendor Analytics | TrustLink",

@@ -161,6 +161,7 @@ export default function EscrowCreateForm() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unexpected error creating the link.";
       setSubmitError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

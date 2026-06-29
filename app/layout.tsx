@@ -10,6 +10,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import TestnetBanner from "@/components/layout/TestnetBanner";
+import OfflineBanner from "@/components/layout/OfflineBanner";
 import { ServiceWorkerProvider } from "@/components/providers/ServiceWorkerProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
@@ -30,6 +31,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://trustlink.app"),
   title: "TrustLink",
   description: "The Web2 experience. The Web3 guarantee.",
 };
@@ -62,6 +64,7 @@ export default function RootLayout({
         </Suspense>
         <NetworkProvider>
           <ServiceWorkerProvider />
+          <OfflineBanner />
           <TestnetBanner />
           <a
             href="#main-content"
