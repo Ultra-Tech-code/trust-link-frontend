@@ -398,6 +398,12 @@ const DisputeForm: React.FC<DisputeFormProps> = ({
                       <button
                         type="button"
                         onClick={() => removeFile(index)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            removeFile(index);
+                          }
+                        }}
                         aria-label={`Delete ${file.name}`}
                         data-testid={`delete-file-${index}`}
                       >
@@ -475,9 +481,15 @@ const DisputeForm: React.FC<DisputeFormProps> = ({
           <h2>✓ Dispute Submitted Successfully!</h2>
           <p>{submitMessage}</p>
           <p>We will review your dispute and get back to you within 3-5 business days.</p>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={resetForm}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                resetForm();
+              }
+            }}
             data-testid="new-dispute-button"
           >
             Submit Another Dispute
@@ -494,9 +506,15 @@ const DisputeForm: React.FC<DisputeFormProps> = ({
         <div className="error-message">
           <h2>✗ Submission Failed</h2>
           <p>{submitMessage}</p>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => setSubmitStatus('idle')}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setSubmitStatus('idle');
+              }
+            }}
             data-testid="try-again-button"
           >
             Try Again
@@ -534,6 +552,12 @@ const DisputeForm: React.FC<DisputeFormProps> = ({
             <button
               type="button"
               onClick={handleBack}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleBack();
+                }
+              }}
               disabled={isSubmitting}
               data-testid="back-button"
             >
@@ -545,6 +569,12 @@ const DisputeForm: React.FC<DisputeFormProps> = ({
             <button
               type="button"
               onClick={handleNext}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleNext();
+                }
+              }}
               disabled={isSubmitting}
               data-testid="next-button"
             >
@@ -554,6 +584,12 @@ const DisputeForm: React.FC<DisputeFormProps> = ({
             <button
               type="button"
               onClick={handleSubmit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
               disabled={isSubmitting}
               data-testid="submit-button"
             >

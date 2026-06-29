@@ -157,6 +157,12 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
             id="export-csv-button"
             type="button"
             onClick={handleExportCsv}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleExportCsv();
+              }
+            }}
             className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             <Download className="h-4 w-4" />
@@ -173,6 +179,12 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
               key={s}
               type="button"
               onClick={() => setStatusFilter(s)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setStatusFilter(s);
+                }
+              }}
               className={`rounded-full px-3 py-1 text-sm font-medium transition ${
                 statusFilter === s
                   ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
@@ -216,6 +228,12 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
           <button
             type="button"
             onClick={clearDateFilter}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                clearDateFilter();
+              }
+            }}
             className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
             Clear dates
@@ -231,6 +249,14 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
               setSearchQuery("");
               setStatusFilter("ALL");
               clearDateFilter();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setSearchQuery("");
+                setStatusFilter("ALL");
+                clearDateFilter();
+              }
             }}
             className="mt-4 text-sm font-medium text-black hover:underline dark:text-white"
           >
@@ -280,6 +306,12 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
                     <button
                       type="button"
                       onClick={() => setSelectedEscrow(escrow)}
+                      onKeyDown={(e) => {
+                        if ((e.key === "Enter" || e.key === " ") && escrow.status === "FUNDED") {
+                          e.preventDefault();
+                          setSelectedEscrow(escrow);
+                        }
+                      }}
                       disabled={escrow.status !== "FUNDED"}
                       className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                     >
@@ -301,6 +333,12 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
           <div className="flex gap-2">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && currentPage > 1) {
+                  e.preventDefault();
+                  setCurrentPage((p) => Math.max(1, p - 1));
+                }
+              }}
               disabled={currentPage === 1}
               className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
@@ -308,6 +346,12 @@ export default function VendorDashboardList({ loading = false }: { loading?: boo
             </button>
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && currentPage < totalPages) {
+                  e.preventDefault();
+                  setCurrentPage((p) => Math.min(totalPages, p + 1));
+                }
+              }}
               disabled={currentPage === totalPages}
               className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
